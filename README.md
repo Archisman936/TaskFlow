@@ -6,17 +6,120 @@ A production-ready **REST API** built with **FastAPI**, featuring **JWT authenti
 
 ## 📋 Table of Contents
 
+- [Quick Start — Docker Hub](#-quick-start--docker-hub)
+- [Local Development Setup](#-local-development-setup)
 - [Features](#-features)
 - [Tech Stack](#-tech-stack)
 - [Project Structure](#-project-structure)
-- [Quick Start — Docker Hub](#-quick-start--docker-hub)
-- [Local Development Setup](#-local-development-setup)
 - [API Documentation](#-api-documentation)
 - [API Endpoints](#-api-endpoints)
 - [Database Schema](#-database-schema)
 - [Security Practices](#-security-practices)
 - [Scalability Notes](#-scalability-notes)
 - [Docker Deployment](#-docker-deployment)
+
+---
+
+## 🐳 Quick Start — Docker Hub
+
+The fastest way to run TaskFlow — no cloning, no setup, just pull and run.
+
+### Prerequisites
+- **Docker** installed and running ([Get Docker](https://docs.docker.com/get-docker/))
+
+### 1. Pull the Images
+```bash
+docker pull archisman2006/taskflow-backend:latest
+docker pull archisman2006/taskflow-frontend:latest
+```
+
+### 2. Run the Backend
+```bash
+docker run -d -p 8000:8000 --name taskflow-backend archisman2006/taskflow-backend:latest
+```
+
+### 3. Run the Frontend
+```bash
+docker run -d -p 3000:80 --name taskflow-frontend archisman2006/taskflow-frontend:latest
+```
+
+### 4. Access the Application
+| Service            | URL                           |
+|:-------------------|:------------------------------|
+| **Frontend**       | http://localhost:3000          |
+| **Backend API**    | http://localhost:8000          |
+| **Swagger Docs**   | http://localhost:8000/docs     |
+| **ReDoc**          | http://localhost:8000/redoc    |
+
+### 5. Stop & Remove Containers
+```bash
+docker stop taskflow-backend taskflow-frontend
+docker rm taskflow-backend taskflow-frontend
+```
+
+> 💡 **Tip**: To run in the foreground (see logs), remove the `-d` flag from the `docker run` commands.
+
+---
+
+## 🚀 Local Development Setup
+
+If you want to modify the source code and run locally without Docker.
+
+### Prerequisites
+- **Python 3.10+** installed
+- **pip** (Python package manager)
+- **Git** (for version control)
+
+### 1. Clone the Repository
+```bash
+git clone https://github.com/Archisman936/TaskFlow.git
+cd TaskFlow
+```
+
+### 2. Set Up Virtual Environment
+```bash
+cd backend
+python -m venv venv
+
+# Windows
+venv\Scripts\activate
+
+# macOS/Linux
+source venv/bin/activate
+```
+
+### 3. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure Environment Variables
+Edit `backend/.env` with your settings:
+```env
+SECRET_KEY=your-super-secret-key-here
+DATABASE_URL=sqlite:///./app.db
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+```
+
+> ⚠️ **Important**: Generate a strong SECRET_KEY for production:
+> ```python
+> python -c "import secrets; print(secrets.token_hex(32))"
+> ```
+
+### 5. Run the Backend Server
+```bash
+uvicorn app.main:app --reload --port 8000
+```
+
+### 6. Open the Frontend
+Open `frontend/index.html` in your browser, or access it via:
+```
+http://localhost:8000/app
+```
+
+### 7. Access API Documentation
+- **Swagger UI**: http://localhost:8000/docs
+- **ReDoc**: http://localhost:8000/redoc
 
 ---
 
@@ -110,109 +213,6 @@ Backend Development/
 ├── .gitignore                   # Git exclusions
 └── README.md                    # This file
 ```
-
----
-
-## 🐳 Quick Start — Docker Hub
-
-The fastest way to run TaskFlow — no cloning, no setup, just pull and run.
-
-### Prerequisites
-- **Docker** installed and running ([Get Docker](https://docs.docker.com/get-docker/))
-
-### 1. Pull the Images
-```bash
-docker pull archisman2006/taskflow-backend:latest
-docker pull archisman2006/taskflow-frontend:latest
-```
-
-### 2. Run the Backend
-```bash
-docker run -d -p 8000:8000 --name taskflow-backend archisman2006/taskflow-backend:latest
-```
-
-### 3. Run the Frontend
-```bash
-docker run -d -p 3000:80 --name taskflow-frontend archisman2006/taskflow-frontend:latest
-```
-
-### 4. Access the Application
-| Service            | URL                           |
-|:-------------------|:------------------------------|
-| **Frontend**       | http://localhost:3000          |
-| **Backend API**    | http://localhost:8000          |
-| **Swagger Docs**   | http://localhost:8000/docs     |
-| **ReDoc**          | http://localhost:8000/redoc    |
-
-### 5. Stop & Remove Containers
-```bash
-docker stop taskflow-backend taskflow-frontend
-docker rm taskflow-backend taskflow-frontend
-```
-
-> 💡 **Tip**: To run in the foreground (see logs), remove the `-d` flag from the `docker run` commands.
-
----
-
-## 🚀 Local Development Setup
-
-If you want to modify the source code and run locally without Docker.
-
-### Prerequisites
-- **Python 3.10+** installed
-- **pip** (Python package manager)
-- **Git** (for version control)
-
-### 1. Clone the Repository
-```bash
-git clone https://github.com/your-username/backend-development.git
-cd backend-development
-```
-
-### 2. Set Up Virtual Environment
-```bash
-cd backend
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# macOS/Linux
-source venv/bin/activate
-```
-
-### 3. Install Dependencies
-```bash
-pip install -r requirements.txt
-```
-
-### 4. Configure Environment Variables
-Edit `backend/.env` with your settings:
-```env
-SECRET_KEY=your-super-secret-key-here
-DATABASE_URL=sqlite:///./app.db
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-```
-
-> ⚠️ **Important**: Generate a strong SECRET_KEY for production:
-> ```python
-> python -c "import secrets; print(secrets.token_hex(32))"
-> ```
-
-### 5. Run the Backend Server
-```bash
-uvicorn app.main:app --reload --port 8000
-```
-
-### 6. Open the Frontend
-Open `frontend/index.html` in your browser, or access it via:
-```
-http://localhost:8000/app
-```
-
-### 7. Access API Documentation
-- **Swagger UI**: http://localhost:8000/docs
-- **ReDoc**: http://localhost:8000/redoc
 
 ---
 
