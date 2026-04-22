@@ -1,0 +1,25 @@
+# ============================================================
+# Python Dependencies
+# ============================================================
+# Core Framework
+fastapi==0.115.0
+uvicorn[standard]==0.30.0
+
+# Database
+sqlalchemy==2.0.35
+
+# Authentication
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+
+# Validation & Settings
+pydantic[email]==2.9.0
+pydantic-settings==2.5.0
+email-validator==2.2.0
+
+# Environment
+python-dotenv==1.0.1
+
+# Multipart form support (for OAuth2 login form)
+python-multipart==0.0.12

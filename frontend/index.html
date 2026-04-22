@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Scalable REST API Dashboard - Manage your tasks with authentication and role-based access control.">
+    <title>TaskFlow — Scalable REST API Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="toast-container" class="toast-container"></div>
+
+    <section id="auth-section">
+        <div class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <div class="logo">⚡ TaskFlow</div>
+                    <p>Scalable REST API with Role-Based Access</p>
+                </div>
+
+                <div class="auth-tabs">
+                    <button class="auth-tab active" id="login-tab" onclick="switchAuthTab('login')">Login</button>
+                    <button class="auth-tab" id="register-tab" onclick="switchAuthTab('register')">Register</button>
+                    <button class="auth-tab admin-tab" id="admin-login-tab" onclick="switchAuthTab('admin')">🛡️ Admin</button>
+                </div>
+
+                <form id="login-form" onsubmit="handleLogin(event)">
+                    <div class="form-group">
+                        <label for="login-username">Username</label>
+                        <input type="text" id="login-username" placeholder="Enter your username" required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" placeholder="Enter your password" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="login-btn">
+                        Sign In
+                    </button>
+                </form>
+
+                <form id="register-form" class="hidden" onsubmit="handleRegister(event)">
+                    <div class="form-group">
+                        <label for="register-username">Username</label>
+                        <input type="text" id="register-username" placeholder="Choose a username" required minlength="3" maxlength="50">
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" placeholder="Min 6 characters" required minlength="6" maxlength="100">
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-full" id="register-btn">
+                        Create Account
+                    </button>
+                </form>
+
+                <form id="admin-login-form" class="hidden" onsubmit="handleAdminLogin(event)">
+                    <div class="admin-login-badge">🛡️ Administrator Access</div>
+                    <div class="form-group">
+                        <label for="admin-username">Admin Username</label>
+                        <input type="text" id="admin-username" placeholder="Enter admin username" required autocomplete="username">
+                    </div>
+                    <div class="form-group">
+                        <label for="admin-password">Admin Password</label>
+                        <input type="password" id="admin-password" placeholder="Enter admin password" required autocomplete="current-password">
+                    </div>
+                    <button type="submit" class="btn btn-admin btn-full" id="admin-login-btn">
+                        🛡️ Sign In as Admin
+                    </button>
+                    <div class="admin-hint">Only pre-authorized admin accounts can access this portal.</div>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section id="dashboard-section" class="hidden">
+        <nav class="navbar">
+            <div class="navbar-content">
+                <div class="navbar-brand">⚡ TaskFlow</div>
+                <div class="navbar-user">
+                    <div class="user-info">
+                        <div class="username" id="nav-username">Username</div>
+                        <span class="role-badge user" id="nav-role">User</span>
+                    </div>
+                    <button class="btn-logout" onclick="handleLogout()">Logout</button>
+                </div>
+            </div>
+        </nav>
+
+        <div class="main-content">
+            <div class="dashboard-header">
+                <h1>Dashboard <span>— Your Tasks</span></h1>
+                <button class="btn btn-primary" onclick="openCreateTaskModal()">
+                    + New Task
+                </button>
+            </div>
+
+            <div class="stats-grid" id="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon">📋</div>
+                    <div class="stat-value" id="stat-total">0</div>
+                    <div class="stat-label">Total Tasks</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">📝</div>
+                    <div class="stat-value" id="stat-todo">0</div>
+                    <div class="stat-label">To Do</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">🔄</div>
+                    <div class="stat-value" id="stat-progress">0</div>
+                    <div class="stat-label">In Progress</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-icon">✅</div>
+                    <div class="stat-value" id="stat-done">0</div>
+                    <div class="stat-label">Done</div>
+                </div>
+            </div>
+
+            <div class="tab-nav" id="dashboard-tabs">
+                <button class="tab-btn active" onclick="switchDashboardTab('tasks')">My Tasks</button>
+                <button class="tab-btn hidden" id="users-tab-btn" onclick="switchDashboardTab('users')">Users (Admin)</button>
+            </div>
+
+            <div id="tasks-tab">
+                <div class="tasks-grid" id="tasks-grid"></div>
+
+                <div class="empty-state hidden" id="empty-state">
+                    <div class="empty-icon">📋</div>
+                    <h3>No tasks yet</h3>
+                    <p>Create your first task to get started!</p>
+                    <button class="btn btn-primary" onclick="openCreateTaskModal()">+ Create Task</button>
+                </div>
+            </div>
+
+            <div id="users-tab" class="hidden">
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Username</th>
+                                <th>Email</th>
+                                <th>Role</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="task-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="modal-title">New Task</h2>
+                <button class="modal-close" onclick="closeTaskModal()">&times;</button>
+            </div>
+            <form id="task-form" onsubmit="handleTaskSubmit(event)">
+                <input type="hidden" id="task-edit-id">
+                <div class="form-group">
+                    <label for="task-title">Title</label>
+                    <input type="text" id="task-title" placeholder="What needs to be done?" required maxlength="200">
+                </div>
+                <div class="form-group">
+                    <label for="task-description">Description</label>
+                    <textarea id="task-description" placeholder="Add details (optional)" maxlength="1000"></textarea>
+                </div>
+                <div class="form-group">
+                    <label for="task-status">Status</label>
+                    <select id="task-status">
+                        <option value="todo">📝 To Do</option>
+                        <option value="in_progress">🔄 In Progress</option>
+                        <option value="done">✅ Done</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="task-priority">Priority</label>
+                    <select id="task-priority">
+                        <option value="low">🟢 Low</option>
+                        <option value="medium" selected>🟡 Medium</option>
+                        <option value="high">🔴 High</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeTaskModal()">Cancel</button>
+                    <button type="submit" class="btn btn-success" id="task-submit-btn">Create Task</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="task-detail-modal" class="modal-overlay hidden">
+        <div class="modal detail-modal">
+            <div class="modal-header">
+                <h2>Task Details</h2>
+                <button class="modal-close" onclick="closeTaskDetailModal()">&times;</button>
+            </div>
+            <div id="task-detail-content" class="task-detail-content"></div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeTaskDetailModal()">Close</button>
+                <button class="btn btn-primary" id="detail-edit-btn" onclick="editFromDetail()">✏️ Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="user-detail-modal" class="modal-overlay hidden">
+        <div class="modal detail-modal">
+            <div class="modal-header">
+                <h2>User Details</h2>
+                <button class="modal-close" onclick="closeUserDetailModal()">&times;</button>
+            </div>
+            <div id="user-detail-content" class="task-detail-content"></div>
+            <div class="modal-footer">
+                <button class="btn btn-outline" onclick="closeUserDetailModal()">Close</button>
+                <button class="btn btn-primary" id="detail-user-edit-btn" onclick="editFromUserDetail()">✏️ Edit</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="user-edit-modal" class="modal-overlay hidden">
+        <div class="modal">
+            <div class="modal-header">
+                <h2 id="user-edit-title">Edit User</h2>
+                <button class="modal-close" onclick="closeUserEditModal()">&times;</button>
+            </div>
+            <form id="user-edit-form" onsubmit="handleUserEditSubmit(event)">
+                <input type="hidden" id="user-edit-id">
+                <div class="form-group">
+                    <label for="user-edit-email">Email</label>
+                    <input type="email" id="user-edit-email" placeholder="Update email address">
+                </div>
+                <div class="form-group">
+                    <label for="user-edit-role">Role</label>
+                    <select id="user-edit-role">
+                        <option value="user">👤 User</option>
+                        <option value="admin">🛡️ Admin</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="user-edit-active">Status</label>
+                    <select id="user-edit-active">
+                        <option value="true">✅ Active</option>
+                        <option value="false">🚫 Inactive</option>
+                    </select>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline" onclick="closeUserEditModal()">Cancel</button>
+                    <button type="submit" class="btn btn-success" id="user-edit-submit-btn">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>
