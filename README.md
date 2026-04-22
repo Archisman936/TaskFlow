@@ -413,9 +413,3 @@ Built as a **Backend Development Assignment** demonstrating:
 - Clean, modular code architecture
 - Full-stack integration (API + Frontend)
 - Deployment readiness (Docker)
-
----
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
